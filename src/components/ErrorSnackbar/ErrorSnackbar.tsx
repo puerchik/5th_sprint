@@ -4,13 +4,14 @@ import { AppRootStateType } from "../../app/store";
 import { appActions } from "../../app/app-reducer";
 import { AlertProps, Snackbar } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
+import { selectError } from "features/TodolistsList/app.selector";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
 export function ErrorSnackbar() {
-  const error = useSelector<AppRootStateType, string | null>((state) => state.app.error);
+  const error = useSelector<AppRootStateType, string | null>(selectError);
   const dispatch = useDispatch();
 
   const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
