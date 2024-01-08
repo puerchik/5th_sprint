@@ -1,15 +1,20 @@
 import { Dispatch } from "redux";
-import { authAPI } from "../api/todolists-api";
-import { authActions } from "../features/Login/auth-reducer";
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { authAPI } from "api/todolists-api";
+import { authActions } from "features/auth/auth.reducer";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
+const initialState = {
+  status: "idle" as RequestStatusType,
+  error: null as string | null,
+  isInitialized: false,
+};
+
+export type AppInitialStateType = typeof initialState;
+export type RequestStatusType = "idle" | "loading" | "succeeded" | "failed";
 
 const slice = createSlice({
   name: "app",
-  initialState: {
-    status: "idle" as RequestStatusType,
-    error: null as string | null,
-    isInitialized: false,
-  },
+  initialState,
   reducers: {
     setAppError: (state, action: PayloadAction<{ error: string | null }>) => {
       state.error = action.payload.error;
@@ -25,7 +30,6 @@ const slice = createSlice({
 
 export const appReducer = slice.reducer;
 export const appActions = slice.actions;
-export type AppInitialStateType = ReturnType<typeof slice.getInitialState>;
 
 export const initializeAppTC = () => (dispatch: Dispatch) => {
   authAPI.me().then((res) => {
@@ -37,7 +41,3 @@ export const initializeAppTC = () => (dispatch: Dispatch) => {
     dispatch(appActions.setAppInitialized({ isInitialized: true }));
   });
 };
-
-// types
-
-export type RequestStatusType = "idle" | "loading" | "succeeded" | "failed";

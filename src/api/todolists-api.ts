@@ -1,4 +1,5 @@
 import axios from "axios";
+import { UpdateDomainTaskModelType } from "features/TodolistsList/tasks.reducer";
 
 const settings = {
   withCredentials: true,
@@ -109,6 +110,11 @@ export type UpdateTaskModelType = {
   priority: TaskPriorities;
   startDate: string;
   deadline: string;
+  args?: {
+    taskId: string;
+    domainModel: UpdateDomainTaskModelType;
+    todolistId: string;
+  };
 };
 type GetTasksResponse = {
   error: string | null;
