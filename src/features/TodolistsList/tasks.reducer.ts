@@ -12,15 +12,14 @@ const initialState: TasksStateType = {};
 const slice = createSlice({
   name: "tasks",
   initialState,
-  reducers: {
-    removeTask: (state, action: PayloadAction<{ taskId: string; todolistId: string }>) => {
-      const tasks = state[action.payload.todolistId];
-      const index = tasks.findIndex((t) => t.id === action.payload.taskId);
-      if (index !== -1) tasks.splice(index, 1);
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(removeTask.fulfilled, (state, action) => {
+        const tasks = state[action.payload.todolistId];
+        const index = tasks.findIndex((t) => t.id === action.payload.taskId);
+        if (index !== -1) tasks.splice(index, 1);
+      })
       .addCase(fetchTasks.fulfilled, (state, action) => {
         state[action.payload.todolistId] = action.payload.tasks;
       })
@@ -71,13 +70,24 @@ const fetchTasks = createAppAsyncThunk<{ tasks: TaskType[]; todolistId: string }
   },
 );
 
-export const removeTaskTC =
-  (taskId: string, todolistId: string): AppThunk =>
-  (dispatch) => {
-    todolistsAPI.deleteTask(todolistId, taskId).then(() => {
-      dispatch(tasksActions.removeTask({ taskId, todolistId }));
-    });
-  };
+type RemoveTaskType = {
+  taskId: string;
+  todolistId: string;
+};
+
+export const removeTask = createAppAsyncThunk<RemoveTaskType, RemoveTaskType>(
+  `${slice.name}/removeTask`,
+  async (args, thunkAPI) => {
+    const { dispatch, rejectWithValue } = thunkAPI;
+    try {
+      const res = await todolistsAPI.deleteTask(args.todolistId, args.taskId);
+      return args;
+    } catch (e) {
+      handleServerNetworkError(e, dispatch);
+      return rejectWithValue(null);
+    }
+  },
+);
 
 export const addTask = createAppAsyncThunk<{ task: TaskType }, { todolistId: string; title: string }>(
   `${slice.name}/addTask`,
@@ -155,4 +165,4 @@ export type TasksStateType = {
 
 export const tasksReducer = slice.reducer;
 export const tasksActions = slice.actions;
-export const tasksThunks = { fetchTasks, addTask, updateTask };
+export const tasksThunks = { fetchTasks, addTask, updateTask, removeTask };
