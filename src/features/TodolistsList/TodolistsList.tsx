@@ -4,7 +4,6 @@ import {
   addTodolistTC,
   changeTodolistTitleTC,
   FilterValuesType,
-  removeTodolistTC,
   todolistsActions,
   todoThunks,
 } from "features/TodolistsList/todolists.reducer";
@@ -59,8 +58,7 @@ export const TodolistsList: React.FC<PropsType> = ({ demo = false }) => {
   }, []);
 
   const removeTodolist = useCallback(function (id: string) {
-    const thunk = removeTodolistTC(id);
-    dispatch(thunk);
+    dispatch(todoThunks.removeTodolist({ id }));
   }, []);
 
   const changeTodolistTitle = useCallback(function (id: string, title: string) {
